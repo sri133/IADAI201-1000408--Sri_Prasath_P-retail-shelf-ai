@@ -1,1 +1,0 @@
-# IADAI201-1000408--Sri_Prasath_P-retail-shelf-ai
