@@ -7,52 +7,59 @@ category, and generate stock-status insights (Out of Stock / Low Stock / In
 Stock) with restocking recommendations — built for RetailSense AI Solutions
 Pvt. Ltd.'s ShelfSmart AI initiative.
 
-**Live app:** _add your Streamlit Cloud link here_
+**Live app:** https://iadai201-1000408--sriprasathp-retail-shelf-ai-mkklv3fv6ea96m8m.streamlit.app/
 
 ## Problem Statement
 Manual shelf monitoring in retail stores is slow and error-prone, leading to
 undetected out-of-stock situations that hurt sales and customer satisfaction.
-This system automates that process using computer vision.
+This system automates that process using computer vision: a store manager
+uploads a shelf photo and instantly sees which products are present, how many
+of each, and what needs restocking — without manually counting anything.
 
 ## Dataset
 - **Source:** [Retail Product Checkout (RPC) Dataset](https://www.kaggle.com/datasets/diyer22/retail-product-checkout-dataset)
-- **Categories used:** 8 of the dataset's 200 categories, selected for strong
-  representation and visual distinctiveness across supercategories:
-  - 97_milk
-  - 129_chocolate
-  - 173_personal_hygiene
-  - 8_puffed_food
-  - 67_dessert
-  - 181_tissue
-  - 82_drink
-  - 48_instant_noodles
+- **License:** CC-BY-NC-SA-4.0
+- **Categories used:** 50 of the dataset's 200 categories, selected for
+  strong representation and coverage across supercategories (milk,
+  chocolate, personal hygiene, puffed food, dessert, tissue, drink, instant
+  noodles, dried fruit, dried food, seasoner, gum, candy, instant drink,
+  alcohol, canned food, stationery). Full category list: see
+  `rpc_selected_categories.json` in this repo.
 - **Source images:** `val2019` + `test2019` splits of RPC (multi-product
   checkout scenes), not `train2019` (single-product exemplar photos), since
   the checkout scenes closely resemble real cluttered shelf images.
-- **Preprocessing:** images resized to 640x640, annotations converted from
-  COCO bounding-box format to YOLO format (normalized center x/y, width,
-  height).
+- **Preprocessing:**
+  - Images resized to 640x640
+  - Annotations converted from COCO bounding-box format
+    (`x, y, width, height` in pixels) to YOLO format (normalized center x/y,
+    width, height)
+  - Augmentation handled by Ultralytics' built-in training-time pipeline
+    (rotation, flips, brightness/HSV jitter, mosaic)
 - **Split:** custom 70% train / 15% validation / 15% test split (not RPC's
-  original split), 8,031 images total.
+  original split), built from the combined pool of images containing the
+  50 selected categories.
 
 ## Model
 - **Architecture:** YOLOv8n (Ultralytics), pretrained on COCO, fine-tuned on
   the prepared dataset.
-- **Training parameters:** 30 epochs, batch size 16, image size 640x640,
-  early stopping patience 10.
+- **Training parameters:**
+  - Epochs: 30 (early stopping patience: 10)
+  - Batch size: 16
+  - Image size: 640x640
+  - Optimizer / hyperparameters: Ultralytics defaults for YOLOv8n
 
 ## Results (test set)
 
 | Metric | Score |
 |---|---|
-| Precision | 99.7% |
-| Recall | 99.7% |
-| mAP@0.5 | 99.4% |
-| mAP@0.5:0.95 | 87.5% |
+| Precision | *(fill in from your 50-category evaluation output)* |
+| Recall | *(fill in)* |
+| mAP@0.5 | *(fill in)* |
+| mAP@0.5:0.95 | *(fill in)* |
 
-Per-category performance was consistently strong (mAP@0.5 between 0.991 and
-0.995 across all 8 categories), indicating no single category dominates or
-underperforms.
+Per-category metrics and training curves (loss, confusion matrix,
+precision-recall curve) are available in the `graphs/` folder and displayed
+in the app's **Model Performance & EDA** page.
 
 ## Stock Status Logic
 | Detected count | Status |
@@ -62,14 +69,17 @@ underperforms.
 | 4+ | In Stock |
 
 The app flags Out of Stock and Low Stock categories with restock
-recommendations, and highlights well-stocked categories.
+recommendations, and highlights well-stocked categories, for every one of
+the 50 tracked categories per uploaded image.
 
 ## App Features
 - Upload a shelf image (JPG/PNG)
 - View the original and annotated (bounding-box) images side by side
-- See per-category detection counts and stock status
-- Get restocking recommendations
+- Per-category detection counts and stock status for all 50 tracked
+  categories
+- Plain-language restocking recommendations
 - Adjustable detection confidence threshold
+- Dedicated Model Performance & EDA page showing training graphs and metrics
 
 ## Running Locally
 ```bash
@@ -86,23 +96,46 @@ are in the same folder as `app.py`.
 ├── best.pt                         # Trained YOLOv8 model weights
 ├── rpc_selected_categories.json    # Category ID -> name mapping
 ├── requirements.txt
+├── packages.txt                    # System-level deps (libgl1) for OpenCV on Streamlit Cloud
+├── graphs/                         # Training/evaluation graphs (confusion matrix, PR curve, etc.)
 ├── notebooks/
 │   └── shelfsmart_training_pipeline.ipynb   # Full data prep + training pipeline
 ├── dataset_sample/                 # Small sample of the dataset (not full 25GB)
 └── README.md
 ```
 
+## Deployment
+Deployed on Streamlit Community Cloud, connected directly to this GitHub
+repository (`main` branch, `app.py` as the entry point). System-level
+dependencies (`libgl1`, `libglib2.0-0`) are installed via `packages.txt` to
+support OpenCV on the deployment image.
+
+## Testing
+The model was tested on unseen shelf images (held-out test split) covering
+varied lighting and product arrangements. Detection was also manually
+verified against sample checkout-scene images to confirm bounding boxes and
+category labels aligned correctly with the products present.
+
+## Limitations
+This prototype recognizes only the 50 trained product categories out of RPC's
+full 200 — products outside this set are not detected. This is a deliberate
+scope decision for a manageable student project; the same pipeline
+(category selection → annotation conversion → training) can be repeated with
+additional categories to extend coverage.
+
 ## References
 - [Ultralytics YOLO Documentation](https://docs.ultralytics.com/)
 - [Retail Product Checkout Dataset (RPC Dataset)](https://www.kaggle.com/datasets/diyer22/retail-product-checkout-dataset)
 - [Streamlit Documentation](https://docs.streamlit.io/)
-- Wei, Xiu-Shen, et al. "RPC: A large-scale retail product checkout dataset." (SKU-110K / RPC benchmark reference)
+- Wei, Xiu-Shen, et al. "RPC: A large-scale retail product checkout dataset."
 
 ## Screenshots
-_Add screenshots of the app demo here before submission._
+_Add screenshots of the app demo here before submission — upload screen,
+a detection result with bounding boxes, and the stock-status/recommendations
+panel._
 
 ## Author
-- **Name:**
-- **Candidate Registration Number:**
+- **Name:** Sri Prasath P
+- **Candidate Registration Number:** 1000408
 - **Course:** Artificial Intelligence — Machine Learning and Deep Learning
-- **School:**
+- **School:**Jain Vidyalaya IB World School
