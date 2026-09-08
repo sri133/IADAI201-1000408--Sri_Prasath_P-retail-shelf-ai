@@ -26,7 +26,6 @@ st.set_page_config(
 
 MODEL_PATH = "best.pt"
 CATEGORIES_JSON = "rpc_selected_categories.json"
-GRAPHS_DIR = "graphs"
 
 STATUS_COLORS = {
     "Out of Stock": "#e74c3c",
@@ -171,7 +170,7 @@ page = st.sidebar.radio(
         "📈 Shelf Comparison (Trend)",
         "📜 Detection History",
         "📚 Category Browser",
-        "📊 Model Performance & EDA",
+        "📊 Model Performance",
     ],
 )
 
@@ -445,46 +444,23 @@ elif page == "📚 Category Browser":
 # PAGE 5 — Model Performance & EDA
 # ------------------------------------------------------------------
 else:
-    st.title("📊 Model Performance & Dataset EDA")
+    st.title("📊 Model Performance")
     st.write(
-        "Training results, evaluation metrics, and dataset exploration graphs "
-        "generated during model development (Ultralytics YOLOv8)."
+        "Final evaluation metrics for the trained YOLOv8 model, computed once "
+        "on the held-out test set during training. These numbers are fixed — "
+        "they describe the model itself, not whatever image you upload on the "
+        "Shelf Detector page."
     )
-
-    graph_files = {
-        "results.png": "Training curves — loss, precision, recall, mAP over epochs",
-        "confusion_matrix.png": "Confusion matrix (raw counts)",
-        "confusion_matrix_normalized.png": "Confusion matrix (normalized)",
-        "PR_curve.png": "Precision-Recall curve",
-        "F1_curve.png": "F1-Confidence curve",
-        "P_curve.png": "Precision-Confidence curve",
-        "R_curve.png": "Recall-Confidence curve",
-        "category_distribution.png": "Dataset category distribution (EDA)",
-        "val_batch0_pred.jpg": "Sample validation predictions",
-    }
-
-    if not os.path.exists(GRAPHS_DIR):
-        st.warning(f"No `{GRAPHS_DIR}/` folder found in the repo. Add your exported training graphs there.")
-    else:
-        found_any = False
-        for filename, caption in graph_files.items():
-            filepath = os.path.join(GRAPHS_DIR, filename)
-            if os.path.exists(filepath):
-                found_any = True
-                st.subheader(caption)
-                st.image(filepath, use_container_width=True)
-                st.markdown("---")
-        if not found_any:
-            st.warning(f"No matching graph files found inside `{GRAPHS_DIR}/`.")
 
     st.subheader("📈 Final Evaluation Metrics")
     st.markdown(
         """
         | Metric | Score |
         |---|---|
-        | Precision | *(fill in from your evaluation output)* |
-        | Recall | *(fill in)* |
-        | mAP@0.5 | *(fill in)* |
-        | mAP@0.5:0.95 | *(fill in)* |
+        | Precision | 99.6% |
+        | Recall | 99.6% |
+        | mAP@0.5 | 99.5% |
+        | mAP@0.5:0.95 | 87.0% |
         """
     )
+    st.caption("Evaluated on a held-out test set of 3,796 images across 50 product categories.")
