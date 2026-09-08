@@ -24,6 +24,200 @@ st.set_page_config(
     layout="wide",
 )
 
+
+# ------------------------------------------------------------------
+# Custom CSS — glassmorphic dark theme, gradient accents, hover-tilt
+# "3D" cards, smooth animations. Pure CSS/HTML — no external JS libs,
+# renders reliably on Streamlit Cloud.
+# ------------------------------------------------------------------
+def inject_custom_css():
+    st.markdown(
+        """
+        <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap');
+
+        html, body, [class*="css"] {
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* App background — deep gradient */
+        .stApp {
+            background: radial-gradient(circle at 10% 0%, #1a1a2e 0%, #0f0f1a 45%, #0a0a12 100%);
+        }
+
+        /* Headings use the display font */
+        h1, h2, h3 {
+            font-family: 'Space Grotesk', sans-serif !important;
+        }
+
+        h1 {
+            background: linear-gradient(90deg, #6dd5ed 0%, #2193b0 40%, #a29bfe 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700 !important;
+            letter-spacing: -0.5px;
+            animation: fadeSlideIn 0.6s ease-out;
+        }
+
+        @keyframes fadeSlideIn {
+            from { opacity: 0; transform: translateY(-12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Sidebar */
+        section[data-testid="stSidebar"] {
+            background: linear-gradient(180deg, #14141f 0%, #0d0d15 100%);
+            border-right: 1px solid rgba(109, 213, 237, 0.15);
+        }
+        section[data-testid="stSidebar"] h1 {
+            font-size: 1.6rem !important;
+        }
+
+        /* Buttons — gradient with hover lift */
+        .stButton > button, .stDownloadButton > button {
+            background: linear-gradient(135deg, #2193b0 0%, #6dd5ed 100%);
+            color: #0a0a12;
+            font-weight: 600;
+            border: none;
+            border-radius: 10px;
+            padding: 0.5rem 1.2rem;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 4px 14px rgba(33, 147, 176, 0.25);
+        }
+        .stButton > button:hover, .stDownloadButton > button:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 8px 22px rgba(109, 213, 237, 0.4);
+            color: #0a0a12;
+        }
+
+        /* File uploader */
+        [data-testid="stFileUploader"] {
+            border: 1.5px dashed rgba(109, 213, 237, 0.35);
+            border-radius: 14px;
+            padding: 0.6rem;
+            background: rgba(255, 255, 255, 0.02);
+            transition: border-color 0.2s ease, background 0.2s ease;
+        }
+        [data-testid="stFileUploader"]:hover {
+            border-color: rgba(109, 213, 237, 0.7);
+            background: rgba(109, 213, 237, 0.04);
+        }
+
+        /* Metric cards — glass panel with hover tilt (pseudo-3D) */
+        [data-testid="stMetric"] {
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 1rem 1.2rem;
+            transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.35s ease;
+            transform-style: preserve-3d;
+            perspective: 800px;
+            animation: fadeIn 0.5s ease-out;
+        }
+        [data-testid="stMetric"]:hover {
+            transform: perspective(800px) rotateX(4deg) rotateY(-4deg) translateY(-4px);
+            box-shadow: 0 14px 30px rgba(109, 213, 237, 0.18);
+            border-color: rgba(109, 213, 237, 0.4);
+        }
+        [data-testid="stMetricLabel"] {
+            color: #9aa0b4 !important;
+        }
+        [data-testid="stMetricValue"] {
+            color: #6dd5ed !important;
+            font-family: 'Space Grotesk', sans-serif !important;
+        }
+
+        /* Custom status card (used in product-wise stock status list) */
+        .stock-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            margin-bottom: 8px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.035);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-left: 5px solid var(--status-color, #6dd5ed);
+            transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.25s ease, background 0.25s ease;
+            transform-style: preserve-3d;
+        }
+        .stock-card:hover {
+            transform: perspective(700px) rotateX(3deg) translateX(4px) scale(1.01);
+            box-shadow: 0 10px 24px rgba(0,0,0,0.35);
+            background: rgba(255, 255, 255, 0.06);
+        }
+        .stock-card .cat-name { font-weight: 600; color: #eaeaf2; }
+        .stock-card .cat-count { color: #b8bcd0; }
+        .stock-card .cat-status { font-weight: 700; }
+
+        /* Image containers get a subtle glow frame */
+        [data-testid="stImage"] img {
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        [data-testid="stImage"] img:hover {
+            transform: scale(1.015);
+            box-shadow: 0 12px 28px rgba(109, 213, 237, 0.2);
+        }
+
+        /* Alerts (error/warning/success/info) — glass style */
+        div[data-testid="stAlert"] {
+            border-radius: 12px;
+            backdrop-filter: blur(6px);
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        /* Radio buttons (sidebar nav) spacing/feel */
+        div[role="radiogroup"] label {
+            transition: transform 0.15s ease;
+        }
+        div[role="radiogroup"] label:hover {
+            transform: translateX(3px);
+        }
+
+        /* Sliders — accent color */
+        .stSlider [data-baseweb="slider"] > div > div {
+            background: linear-gradient(90deg, #2193b0, #6dd5ed) !important;
+        }
+
+        /* Horizontal rule glow */
+        hr {
+            border: none;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(109,213,237,0.35), transparent);
+            margin: 1.4rem 0;
+        }
+
+        /* Hero banner block */
+        .hero-banner {
+            padding: 1.6rem 1.8rem;
+            border-radius: 20px;
+            background: linear-gradient(135deg, rgba(33,147,176,0.15) 0%, rgba(162,155,254,0.12) 100%);
+            border: 1px solid rgba(255,255,255,0.08);
+            margin-bottom: 1.2rem;
+            animation: fadeSlideIn 0.6s ease-out;
+            backdrop-filter: blur(10px);
+        }
+        .hero-banner p {
+            color: #c7cbe0;
+            margin: 0;
+            font-size: 1.02rem;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
 MODEL_PATH = "best.pt"
 CATEGORIES_JSON = "rpc_selected_categories.json"
 
@@ -153,6 +347,8 @@ if "history" not in st.session_state:
     st.session_state.history = []  # list of dicts: {name, timestamp, total_items, categories_detected, health_score}
 
 
+inject_custom_css()
+
 # ------------------------------------------------------------------
 # Sidebar navigation
 # ------------------------------------------------------------------
@@ -209,9 +405,15 @@ class_names = model.names if isinstance(model.names, list) else [model.names[i] 
 # ------------------------------------------------------------------
 if page == "🔍 Shelf Detector":
     st.title("ShelfSmart AI — Automated Shelf Intelligence")
-    st.write(
-        "Upload one or more shelf images to detect products, count them by category, "
-        "and get instant restocking insights."
+    st.markdown(
+        """
+        <div class="hero-banner">
+            <p>Upload one or more shelf images to detect products, count them by category,
+            and get instant restocking insights — powered by a YOLOv8 model trained on
+            50 retail product categories.</p>
+        </div>
+        """,
+        unsafe_allow_html=True,
     )
 
     uploaded_files = st.file_uploader(
@@ -282,12 +484,10 @@ if page == "🔍 Shelf Detector":
                 color = STATUS_COLORS[row["status"]]
                 st.markdown(
                     f"""
-                    <div style="display:flex; justify-content:space-between; align-items:center;
-                                padding:10px 14px; margin-bottom:6px; border-radius:8px;
-                                background-color:#1e1e1e; border-left:6px solid {color};">
-                        <span style="font-weight:600;">{row['category']}</span>
-                        <span>{row['count']} detected</span>
-                        <span style="color:{color}; font-weight:700;">{STATUS_ICON[row['status']]} {row['status']}</span>
+                    <div class="stock-card" style="--status-color:{color};">
+                        <span class="cat-name">{row['category']}</span>
+                        <span class="cat-count">{row['count']} detected</span>
+                        <span class="cat-status" style="color:{color};">{STATUS_ICON[row['status']]} {row['status']}</span>
                     </div>
                     """,
                     unsafe_allow_html=True,
