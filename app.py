@@ -1,12 +1,4 @@
-"""
-StockSense Pro / ShelfSmart AI
-AI-based Cognitive Retail Vision System for Automated Shelf Intelligence
 
-UI theme: "Aurora" — a soft-futuristic pastel glassmorphism design
-(mint / sky / lavender / rose aurora glows on deep indigo, frosted-glass
-cards, gradient typography, slow relaxing motion).
-All detection & analytics logic is unchanged from the original build.
-"""
 
 import csv
 import io
