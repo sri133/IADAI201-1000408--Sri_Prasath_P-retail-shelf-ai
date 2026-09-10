@@ -1,5 +1,3 @@
-
-
 import csv
 import io
 import json
@@ -13,9 +11,7 @@ import streamlit as st
 from PIL import Image, UnidentifiedImageError
 from ultralytics import YOLO
 
-# ------------------------------------------------------------------
-# Page config
-# ------------------------------------------------------------------
+
 st.set_page_config(
     page_title="ShelfSmart AI - Retail Shelf Monitoring",
     page_icon="🛒",
@@ -23,10 +19,7 @@ st.set_page_config(
 )
 
 
-# ------------------------------------------------------------------
-# Aurora theme — soft futuristic pastel glassmorphism.
-# Pure CSS, no external JS, renders reliably on Streamlit Cloud.
-# ------------------------------------------------------------------
+
 AURORA_CSS = """
 @import url('https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap');
 
@@ -942,16 +935,14 @@ MODEL_PATH = "best.pt"
 CATEGORIES_JSON = "rpc_selected_categories.json"
 
 STATUS_COLORS = {
-    "Out of Stock": "#ff8fab",  # soft coral
-    "Low Stock": "#ffd166",     # warm amber
-    "In Stock": "#5ef2c0",      # mint green
+    "Out of Stock": "#ff8fab",  
+    "Low Stock": "#ffd166",     
+    "In Stock": "#5ef2c0",      
 }
 STATUS_ICON = {"Out of Stock": "🔴", "Low Stock": "🟡", "In Stock": "🟢"}
 
 
-# ------------------------------------------------------------------
-# Cached loaders
-# ------------------------------------------------------------------
+
 @st.cache_resource
 def load_model(model_path: str):
     return YOLO(model_path)
@@ -965,9 +956,6 @@ def load_category_names(json_path: str):
     return {}
 
 
-# ------------------------------------------------------------------
-# Core helpers (unchanged from original build)
-# ------------------------------------------------------------------
 def get_stock_status(count: int, low_stock_max: int) -> str:
     if count == 0:
         return "Out of Stock"
@@ -987,7 +975,7 @@ def draw_detections(image: np.ndarray, boxes, class_names, low_conf_flag: float)
         label = class_names[cls_idx] if cls_idx < len(class_names) else str(cls_idx)
 
         uncertain = conf < low_conf_flag
-        color = (0, 165, 255) if uncertain else (46, 204, 113)  # BGR: orange vs green
+        color = (0, 165, 255) if uncertain else (46, 204, 113)  
         cv2.rectangle(annotated, (x1, y1), (x2, y2), color, 2)
 
         tag = "?" if uncertain else ""
@@ -1060,9 +1048,7 @@ def safe_load_image(uploaded_file):
         return None
 
 
-# ------------------------------------------------------------------
-# UI helpers — presentation only (no analytics logic here)
-# ------------------------------------------------------------------
+
 def status_pill(status: str) -> str:
     color = STATUS_COLORS[status]
     return f'<span class="pill" style="--sc:{color};"><i></i>{esc(status)}</span>'
@@ -1186,18 +1172,14 @@ def hero_html() -> str:
 </div>'''
 
 
-# ------------------------------------------------------------------
-# Session state init (for detection history)
-# ------------------------------------------------------------------
+
 if "history" not in st.session_state:
-    st.session_state.history = []  # list of dicts: {name, timestamp, total_items, categories_detected, health_score}
+    st.session_state.history = []  
 
 
 inject_custom_css()
 
-# ------------------------------------------------------------------
-# Sidebar navigation
-# ------------------------------------------------------------------
+
 st.sidebar.markdown(BRAND_HTML, unsafe_allow_html=True)
 st.sidebar.markdown("---")
 
@@ -1248,9 +1230,7 @@ model = load_model(MODEL_PATH)
 class_names = model.names if isinstance(model.names, list) else [model.names[i] for i in range(len(model.names))]
 
 
-# ------------------------------------------------------------------
-# PAGE 1 — Shelf Detector (single + batch)
-# ------------------------------------------------------------------
+
 if page == "🔍 Shelf Detector":
     st.title("ShelfSmart AI — Automated Shelf Intelligence")
     st.markdown(hero_html(), unsafe_allow_html=True)
@@ -1260,7 +1240,7 @@ if page == "🔍 Shelf Detector":
     )
 
     if uploaded_files:
-        batch_results = []  # for ranking across multiple images
+        batch_results = []  
 
         for uploaded_file in uploaded_files:
             image = safe_load_image(uploaded_file)
@@ -1310,7 +1290,7 @@ if page == "🔍 Shelf Detector":
                     + (" ..." if len(uncertain) > 10 else "")
                 )
 
-            # Category search/filter
+            
             search_term = st.text_input(
                 f"🔎 Filter categories (image: {uploaded_file.name})", key=f"filter_{uploaded_file.name}"
             )
@@ -1323,7 +1303,7 @@ if page == "🔍 Shelf Detector":
                 st.markdown(stock_card_html(row, meter_scale=max(low_stock_max + 4, 8)),
                             unsafe_allow_html=True)
 
-            # Priority restock ordering
+            
             restock_priority = priority_restock_list(stock_table)
             if restock_priority:
                 st.markdown("### 🔔 Priority Restock Order (emptiest first)")
@@ -1332,7 +1312,7 @@ if page == "🔍 Shelf Detector":
             else:
                 st.success("🟢 All tracked categories are adequately stocked.")
 
-            # Downloadable report
+           
             csv_data = generate_csv_report(stock_table, uploaded_file.name)
             st.download_button(
                 label="⬇️ Download stock report (CSV)",
@@ -1342,7 +1322,7 @@ if page == "🔍 Shelf Detector":
                 key=f"download_{uploaded_file.name}",
             )
 
-            # Log to session history
+            
             st.session_state.history.append({
                 "name": uploaded_file.name,
                 "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
@@ -1354,7 +1334,7 @@ if page == "🔍 Shelf Detector":
             batch_results.append({"name": uploaded_file.name, "health_score": health, "total_items": total_items})
             st.markdown("---")
 
-        # Shelf ranking, only meaningful with 2+ images
+        
         if len(batch_results) > 1:
             st.markdown("## 🏆 Shelf Ranking")
             ranked = sorted(batch_results, key=lambda r: r["health_score"], reverse=True)
@@ -1365,9 +1345,7 @@ if page == "🔍 Shelf Detector":
         st.info("👆 Upload one or more shelf images to get started.")
 
 
-# ------------------------------------------------------------------
-# PAGE 2 — Shelf Comparison / Trend
-# ------------------------------------------------------------------
+
 elif page == "📈 Shelf Comparison (Trend)":
     st.title("📈 Shelf Comparison — Stock Trend")
     st.markdown(
@@ -1421,7 +1399,7 @@ elif page == "📈 Shelf Comparison (Trend)":
                 after_c = after_counts.get(label, 0)
                 delta = after_c - before_c
                 if delta == 0 and before_c == 0:
-                    continue  # skip categories with no activity either time
+                    continue  
                 note = ""
                 if delta < 0:
                     note = "likely selling fast" if abs(delta) >= 2 else ""
@@ -1430,9 +1408,7 @@ elif page == "📈 Shelf Comparison (Trend)":
         st.info("👆 Upload both a 'before' and 'after' image of the same shelf to compare.")
 
 
-# ------------------------------------------------------------------
-# PAGE 3 — Detection History
-# ------------------------------------------------------------------
+
 elif page == "📜 Detection History":
     st.title("📜 Detection History (this session)")
     st.markdown(
@@ -1452,9 +1428,7 @@ elif page == "📜 Detection History":
             st.rerun()
 
 
-# ------------------------------------------------------------------
-# PAGE 4 — Category Browser
-# ------------------------------------------------------------------
+
 elif page == "📚 Category Browser":
     st.title("📚 Tracked Product Categories")
     st.markdown(
@@ -1488,9 +1462,7 @@ elif page == "📚 Category Browser":
         st.markdown(f'<div class="chip-cloud">{chips}</div>', unsafe_allow_html=True)
 
 
-# ------------------------------------------------------------------
-# PAGE 5 — Model Performance & EDA
-# ------------------------------------------------------------------
+
 else:
     st.title("📊 Model Performance")
     st.markdown(
