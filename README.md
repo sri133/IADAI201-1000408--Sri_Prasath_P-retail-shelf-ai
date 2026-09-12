@@ -227,14 +227,11 @@ uploads.
 
 ## Screenshots
 
-*(Add before final submission — required by the assignment checklist)*
+📁 **[View all project screenshots →](./screenshots)**
 
-- [ ] Shelf Detector — image upload screen
-- [ ] Shelf Detector — annotated detection result with bounding boxes
-- [ ] Product-wise stock status panel with color-coded cards
-- [ ] Shelf Comparison (Trend) page
-- [ ] Model Performance page
-- [ ] Training confusion matrix / PR curve (from `graphs/`)
+The `screenshots/` folder contains the full project demo — dataset
+structure, annotated detections, stock status panel, model evaluation
+metrics, and confusion matrix.
 
 ## Testing
 
