@@ -231,7 +231,8 @@ uploads.
 
 The `screenshots/` folder contains the full project demo — dataset
 structure, annotated detections, stock status panel, model evaluation
-metrics, confusion matrix, app flow, app pipeline diagram, data processing pipeline, app data flow, and web app ui ux and use sample screen shot,.
+metrics, confusion matrix, app flow, app pipeline diagram, data processing 
+pipeline, app deployment flow diagram, and web app ui ux and use sample screen shot.
 
 ## Testing
 
