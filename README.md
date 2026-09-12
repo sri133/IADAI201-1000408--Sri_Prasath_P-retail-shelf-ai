@@ -4,7 +4,7 @@
 **RetailSense AI Solutions Pvt. Ltd.**
 CRS: Artificial Intelligence | Course: Machine Learning and Deep Learning
 
-**🔗 Live App:** https://iadai201-1000408--sriprasathp-retail-shelf-ai-mkklv3fv6ea96m8m.streamlit.app/
+**🔗 Live App:** https://iadai201-1000408--sriprasathp-retail-shelf-ai-ujku4ct9gpxpmsbp.streamlit.app/
 **🔗 GitHub Repository:** *(this repository)*
 
 ---
